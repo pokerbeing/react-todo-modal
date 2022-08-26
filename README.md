@@ -1,2 +1,2 @@
-# react-todo-modal
+# todo
 Created with CodeSandbox
