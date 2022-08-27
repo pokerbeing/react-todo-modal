@@ -25,9 +25,13 @@ const classNames = {
 // Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
 Modal.setAppElement("#root");
 
+// Used to put a unique identifier on each new
 let id = 0;
 
-// Takes the properties from each todo and puts them into the form of HTML
+// Takes the properties (props) from each todo: 
+//    variables: id, text, checked, and 
+//    functions: onToggle, onDelete
+// and adds them into the HTML form
 // Filling in the todo.text and the checkbox and delete button links
 const Todo = (props) => (   
   <li className={classNames.TODO_ITEM}>
@@ -188,6 +192,7 @@ export default class App extends React.Component {
             <ul id="todo-list">
               {this.state.todos.map((todo) => (
                 <Todo
+                  // pass functions from App down to each Todo as props
                   onToggle={() => this.toggleTodo(todo.id)}
                   onDelete={() => this.removeTodo(todo.id)}
                   todo={todo}
