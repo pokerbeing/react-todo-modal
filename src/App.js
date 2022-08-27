@@ -27,16 +27,17 @@ Modal.setAppElement("#root");
 
 let id = 0;
 
-// Takes the properties from each today and puts them into the form of HTML
+// Takes the properties from each todo and puts them into the form of HTML
 // Filling in the todo.text and the checkbox and delete button links
-const Todo = (props) => (
+const Todo = (props) => (   
   <li className={classNames.TODO_ITEM}>
     <input
       type="checkbox"
       className={classNames.TODO_CHECKBOX}
       checked={props.todo.checked}
-      onChange={props.onToggle}
-    />
+      onChange={props.onToggle}   // When checkbox is changed, it triggers onToggle in Todo
+                                  // onToggle, in turn, calls toggleTodo function in App
+    />                           
     <button className={classNames.TODO_DELETE} onClick={props.onDelete}>
       delete
     </button>
