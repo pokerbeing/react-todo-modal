@@ -28,20 +28,20 @@ Modal.setAppElement("#root");
 // Used to put a unique identifier on each new
 let id = 0;
 
-// Takes the properties (props) from each todo: 
-//    variables: id, text, checked, and 
+// Takes the properties (props) from each todo:
+//    variables: id, text, checked, and
 //    functions: onToggle, onDelete
 // and adds them into the HTML form
 // Filling in the todo.text and the checkbox and delete button links
-const Todo = (props) => (   
+const Todo = (props) => (
   <li className={classNames.TODO_ITEM}>
     <input
       type="checkbox"
       className={classNames.TODO_CHECKBOX}
       checked={props.todo.checked}
-      onChange={props.onToggle}   // When checkbox is changed, it triggers onToggle in Todo
-                                  // onToggle, in turn, calls toggleTodo function in App
-    />                           
+      onChange={props.onToggle} // When checkbox is changed, it triggers onToggle in Todo
+      // onToggle, in turn, calls toggleTodo function in App
+    />
     <button className={classNames.TODO_DELETE} onClick={props.onDelete}>
       delete
     </button>
@@ -108,6 +108,11 @@ export default class App extends React.Component {
     } else {
       return;
     }
+  }
+
+  // Edit an existing todo
+  editTodo(id) {
+    todo = this.state.todos;
   }
 
   // Remove todo from todo list by filtering it out
