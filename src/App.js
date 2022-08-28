@@ -19,7 +19,8 @@ const classNames = {
   TODO_ITEM: "todo-container",
   TODO_CHECKBOX: "todo-checkbox",
   TODO_TEXT: "todo-text",
-  TODO_DELETE: "todo-delete"
+  TODO_DELETE: "todo-delete",
+  TODO_EDIT: "todo-edit"
 };
 
 // Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
@@ -42,6 +43,9 @@ const Todo = (props) => (
       onChange={props.onToggle} // When checkbox is changed, it triggers onToggle in Todo
       // onToggle, in turn, calls toggleTodo function in App
     />
+    <button className={classNames.TODO_EDIT} onClick={props.onEdit}>
+      edit
+    </button>
     <button className={classNames.TODO_DELETE} onClick={props.onDelete}>
       delete
     </button>
@@ -112,7 +116,11 @@ export default class App extends React.Component {
 
   // Edit an existing todo
   editTodo(id) {
-    todo = this.state.todos;
+    const todoToEdit = this.state.todos[id];
+    this.setState({
+      response: todoToEdit.text
+    });
+    this.openModal();
   }
 
   // Remove todo from todo list by filtering it out
@@ -200,6 +208,7 @@ export default class App extends React.Component {
                   // pass functions from App down to each Todo as props
                   onToggle={() => this.toggleTodo(todo.id)}
                   onDelete={() => this.removeTodo(todo.id)}
+                  onEdit={() => this.editTodo(todo.id)}
                   todo={todo}
                   key={todo.id}
                 />
