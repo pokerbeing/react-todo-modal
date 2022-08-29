@@ -62,7 +62,8 @@ export default class App extends React.Component {
       todos: [], // Create an empty list to hold todos
       response: "",
       ModalIsOpen: false,
-      editingID: null
+      editingID: null,
+      editingChecked: false
     };
   }
 
@@ -85,23 +86,33 @@ export default class App extends React.Component {
     if (this.state.response === "" || this.state.response === null) {
       return;
     }
+    // if todo is being edited
     if (this.state.editingID !== null) {
-      id = this.state.editingID;
+      let editID = this.state.editingID;
+      // copy existing todos
+      const copyTodos = this.state.todos.slice();
+      // change the one being edited
+      copyTodos[editID] = {
+        id: editID,
+        text: this.state.response,
+        checked: this.state.editingChecked
+      };
+      // save changed todos back to state
+      this.setState({ todos: copyTodos });
       this.setState({
         editingID: null
       });
-      this.removeTodo(id);
     } else {
-      id++;
+      // if this is a new todo
+      this.setState({
+        todos: [
+          // Get existing todos from list
+          ...this.state.todos,
+          // Create a new todo object with three properties and increment id
+          { id: id++, text: this.state.response, checked: false }
+        ]
+      });
     }
-    this.setState({
-      todos: [
-        // Get existing todos from list
-        ...this.state.todos,
-        // Create a new todo object with three properties and increment id
-        { id: id, text: this.state.response, checked: false }
-      ]
-    });
   }
 
   // Save user response to state as they ype
@@ -126,11 +137,15 @@ export default class App extends React.Component {
 
   // Edit an existing todo
   editTodo(id) {
+    // Get the todo to be edited
     const todoToEdit = this.state.todos[id];
+    // Save its current info before editing
     this.setState({
       response: todoToEdit.text,
-      editingID: id
+      editingID: id,
+      editingChecked: todoToEdit.checked
     });
+    // Open the modal to allow editing
     this.openModal();
   }
 
