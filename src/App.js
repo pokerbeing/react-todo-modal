@@ -19,7 +19,8 @@ const classNames = {
   TODO_ITEM: "todo-container",
   TODO_CHECKBOX: "todo-checkbox",
   TODO_TEXT: "todo-text",
-  TODO_DELETE: "todo-delete"
+  TODO_DELETE: "todo-delete",
+  TODO_EDIT: "todo-edit"
 };
 
 // Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
@@ -28,20 +29,23 @@ Modal.setAppElement("#root");
 // Used to put a unique identifier on each new
 let id = 0;
 
-// Takes the properties (props) from each todo: 
-//    variables: id, text, checked, and 
+// Takes the properties (props) from each todo:
+//    variables: id, text, checked, and
 //    functions: onToggle, onDelete
 // and adds them into the HTML form
 // Filling in the todo.text and the checkbox and delete button links
-const Todo = (props) => (   
+const Todo = (props) => (
   <li className={classNames.TODO_ITEM}>
     <input
       type="checkbox"
       className={classNames.TODO_CHECKBOX}
       checked={props.todo.checked}
-      onChange={props.onToggle}   // When checkbox is changed, it triggers onToggle in Todo
-                                  // onToggle, in turn, calls toggleTodo function in App
-    />                           
+      onChange={props.onToggle} // When checkbox is changed, it triggers onToggle in Todo
+      // onToggle, in turn, calls toggleTodo function in App
+    />
+    <button className={classNames.TODO_EDIT} onClick={props.onEdit}>
+      edit
+    </button>
     <button className={classNames.TODO_DELETE} onClick={props.onDelete}>
       delete
     </button>
@@ -57,7 +61,9 @@ export default class App extends React.Component {
       // Add a state
       todos: [], // Create an empty list to hold todos
       response: "",
-      ModalIsOpen: false
+      ModalIsOpen: false,
+      editingID: null,
+      editingChecked: false
     };
   }
 
@@ -76,18 +82,37 @@ export default class App extends React.Component {
   }
 
   // Get response from state, create a todo object and add it to the list of todos
-  addTodo() {
+  addTodo(props) {
     if (this.state.response === "" || this.state.response === null) {
       return;
     }
-    this.setState({
-      todos: [
-        // Get existing todos from list
-        ...this.state.todos,
-        // Create a new todo object with three properties and increment id
-        { id: id++, text: this.state.response, checked: false }
-      ]
-    });
+    // if todo is being edited
+    if (this.state.editingID !== null) {
+      let editID = this.state.editingID;
+      // copy existing todos
+      const copyTodos = this.state.todos.slice();
+      // change the one being edited
+      copyTodos[editID] = {
+        id: editID,
+        text: this.state.response,
+        checked: this.state.editingChecked
+      };
+      // save changed todos back to state
+      this.setState({ todos: copyTodos });
+      this.setState({
+        editingID: null
+      });
+    } else {
+      // if this is a new todo
+      this.setState({
+        todos: [
+          // Get existing todos from list
+          ...this.state.todos,
+          // Create a new todo object with three properties and increment id
+          { id: id++, text: this.state.response, checked: false }
+        ]
+      });
+    }
   }
 
   // Save user response to state as they ype
@@ -108,6 +133,20 @@ export default class App extends React.Component {
     } else {
       return;
     }
+  }
+
+  // Edit an existing todo
+  editTodo(id) {
+    // Get the todo to be edited
+    const todoToEdit = this.state.todos[id];
+    // Save its current info before editing
+    this.setState({
+      response: todoToEdit.text,
+      editingID: id,
+      editingChecked: todoToEdit.checked
+    });
+    // Open the modal to allow editing
+    this.openModal();
   }
 
   // Remove todo from todo list by filtering it out
@@ -163,6 +202,7 @@ export default class App extends React.Component {
           <div>
             <Modal
               isOpen={this.state.ModalIsOpen}
+              idBeingEdited={this.state.editing}
               onRequestClose={() => this.closeModal()}
               style={customStyles}
               contentLabel="Example Modal"
@@ -194,6 +234,7 @@ export default class App extends React.Component {
                 <Todo
                   // pass functions from App down to each Todo as props
                   onToggle={() => this.toggleTodo(todo.id)}
+                  onEdit={() => this.editTodo(todo.id)}
                   onDelete={() => this.removeTodo(todo.id)}
                   todo={todo}
                   key={todo.id}
