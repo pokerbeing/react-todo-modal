@@ -61,7 +61,8 @@ export default class App extends React.Component {
       // Add a state
       todos: [], // Create an empty list to hold todos
       response: "",
-      ModalIsOpen: false
+      ModalIsOpen: false,
+      editingID: null
     };
   }
 
@@ -80,16 +81,25 @@ export default class App extends React.Component {
   }
 
   // Get response from state, create a todo object and add it to the list of todos
-  addTodo() {
+  addTodo(props) {
     if (this.state.response === "" || this.state.response === null) {
       return;
+    }
+    if (this.state.editingID !== null) {
+      id = this.state.editingID;
+      this.setState({
+        editingID: null
+      });
+      this.removeTodo(id);
+    } else {
+      id++;
     }
     this.setState({
       todos: [
         // Get existing todos from list
         ...this.state.todos,
         // Create a new todo object with three properties and increment id
-        { id: id++, text: this.state.response, checked: false }
+        { id: id, text: this.state.response, checked: false }
       ]
     });
   }
@@ -118,7 +128,8 @@ export default class App extends React.Component {
   editTodo(id) {
     const todoToEdit = this.state.todos[id];
     this.setState({
-      response: todoToEdit.text
+      response: todoToEdit.text,
+      editingID: id
     });
     this.openModal();
   }
@@ -176,6 +187,7 @@ export default class App extends React.Component {
           <div>
             <Modal
               isOpen={this.state.ModalIsOpen}
+              idBeingEdited={this.state.editing}
               onRequestClose={() => this.closeModal()}
               style={customStyles}
               contentLabel="Example Modal"
@@ -207,8 +219,8 @@ export default class App extends React.Component {
                 <Todo
                   // pass functions from App down to each Todo as props
                   onToggle={() => this.toggleTodo(todo.id)}
-                  onDelete={() => this.removeTodo(todo.id)}
                   onEdit={() => this.editTodo(todo.id)}
+                  onDelete={() => this.removeTodo(todo.id)}
                   todo={todo}
                   key={todo.id}
                 />
